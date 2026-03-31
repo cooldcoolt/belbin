@@ -174,8 +174,20 @@
     }, 2200);
   }
 
-  function shareWhatsApp() {
+  async function shareWhatsApp() {
     const text = window.__lastResultText || "";
+    if (navigator.share) {
+      try {
+        const payload = { text };
+        if (navigator.canShare && !navigator.canShare(payload)) {
+          throw new Error("cannot share");
+        }
+        await navigator.share(payload);
+        return;
+      } catch (e) {
+        if (e && e.name === "AbortError") return;
+      }
+    }
     window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank", "noopener,noreferrer");
   }
 
